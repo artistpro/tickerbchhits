@@ -1,53 +1,59 @@
-<!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-  <div class="tradingview-widget-copyright"><a href="https://es.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Siga los mercados en TradingView</span></a></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-  {
-  "symbols": [
-    {
-      "proName": "FOREXCOM:SPXUSD",
-      "title": "S&P 500 Index"
-    },
-    {
-      "proName": "FX_IDC:EURUSD",
-      "title": "EUR to USD"
-    },
-    {
-      "description": "BITCOIN",
-      "proName": "BINANCE:BCHUSD"
-    },
-    {
-      "description": "BTC",
-      "proName": "BITSTAMP:BTCUSD"
-    },
-    {
-      "description": "ETH",
-      "proName": "BINANCE:ETHUSD"
-    },
-    {
-      "description": "XRM",
-      "proName": "CRYPTO:XMRUSD"
-    },
-    {
-      "description": "RON",
-      "proName": "BINANCE:RONINUSDT"
-    },
-    {
-      "description": "ORO",
-      "proName": "TVC:GOLD"
-    },
-    {
-      "description": "PLATA",
-      "proName": "TVC:SILVER"
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticker Crypto OBS</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000000; /* 🔹 Fondo negro */
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      color: #00ff90; /* verde neón */
+      overflow: hidden;
     }
-  ],
-  "showSymbolLogo": true,
-  "isTransparent": true,
-  "displayMode": "adaptive",
-  "colorTheme": "light",
-  "locale": "es"
-}
+    .ticker {
+      white-space: nowrap;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: 100vw;
+    }
+    .ticker span {
+      display: inline-block;
+      padding: 0 2rem;
+      animation: scroll 25s linear infinite;
+    }
+    @keyframes scroll {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="ticker" id="prices">Cargando precios...</div>
+
+  <script>
+    async function loadPrices(){
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,bitcoin-cash,ethereum,monero,ronin&vs_currencies=usd");
+        const data = await res.json();
+
+        // construimos el string del ticker
+        const text =
+          `BTC: $${data.bitcoin.usd} | ` +
+          `BCH: $${data["bitcoin-cash"].usd} | ` +
+          `ETH: $${data.ethereum.usd} | ` +
+          `XMR: $${data.monero.usd} | ` +
+          `RON: $${data.ronin.usd}`;
+
+        document.getElementById("prices").innerHTML = `<span>${text}</span><span>${text}</span>`;
+      } catch(e){
+        document.getElementById("prices").innerText = "Error cargando precios";
+      }
+    }
+
+    loadPrices();
+    setInterval(loadPrices, 60000); // refresca cada minuto
   </script>
-</div>
-<!-- TradingView Widget END -->
+</body>
+</html>
